@@ -44,13 +44,12 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
   },
-  numbers: {
-    fontSize: 50,
-    flexDirection: "row",
-  },
   text: {
     marginTop: 10,
     marginBottom: 5,
+  },
+  row: {
+    marginLeft: 6,
   },
   flex: {
     flexDirection: "row",

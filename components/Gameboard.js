@@ -23,7 +23,7 @@ export default function Gameboard() {
     const [dicePointsTotal, setDicePointsTotal] = useState(new Array(6).fill(0));    
 
     /* const [loaded] = useFonts({
-        'DancingScript' : require('./assets/fonts/DancingScript-VariableFont_wght.ttf') 
+        'DancingScript' : require('../assets/fonts/DancingScript-VariableFont_wght.ttf') 
     });
     if (!loaded) {
         return null;
@@ -49,9 +49,11 @@ export default function Gameboard() {
     const row2 = [];
     for (let s = 1; s <= MAX_SPOT; s++) {
         row2.push(
+            <View>
+                <Text style={[styles.row]}>{dicePointsTotal[s]}</Text>
             <Pressable                    
               key={"row2" + s}                   
-              onPress={() => selectDicePoints(s)}> 
+              onPress={() => selectDicePoint(s)}> 
             <MaterialCommunityIcons
                 name={'numeric-' + s + '-circle'}
                 key={"row2" + s}
@@ -59,13 +61,15 @@ export default function Gameboard() {
                 color={getDicePointColor(s)} > 
             </MaterialCommunityIcons>
             </Pressable> 
+            </View>
         );         
     }  
     
     /* const row3 = [];
+    for (let s = 1; s <= MAX_SPOT; s++)
         row3.push(
             setDicePointsTotal(dicePointsTotal)
-        ); */
+        ); */ 
     
 
     useEffect(() => {
@@ -134,16 +138,32 @@ export default function Gameboard() {
         } */
     }
 
-    function selectDicePoints(s) {
-        let points = [...selectedDicePoints];
-        points[s] = selectedDicePoints[s] ? false : true;
-        setSelectedDicePoints(points);
-        /*if (selectedDicePoints[s] === false) {
-            setStatus('Select points.');
-             let diceSpots = s;
-            let dicePointsTotal = diceSpots * sum;
-            setDicePointsTotal(new Array(6).fill(dicePointsTotal)); 
-        } */
+    function selectDicePoint(s) {
+        if (nbrOfThrowsLeft === 0) {
+            let points = [...selectedDicePoints];
+            points[s] = selectedDicePoints[s] ? false : true;
+            setSelectedDicePoints(points);
+            setSelectedDices(new Array(NBR_OF_DICES).fill(false));
+            setStatus('Throw dices');
+            throwDices();
+            if (!points[s]) {
+                points[s] = true;
+                let pointsTotal = [...dicePointsTotal]; 
+            
+                let nbrOfDices = 0;
+                //let nbrOfDices = diceSpots.reduce((total, x) => (x === (s + 1) ? total + 1 : total), 0);
+                for (let spot = 0; spot < diceSpots.length; spot++) {
+                    if (diceSpots[spot] === s) {
+                        nbrOfDices++;
+                    }
+                }
+                pointsTotal[s] = nbrOfDices * (s + 1) ;
+                setDicePointsTotal(pointsTotal);
+
+                return pointsTotal[s];
+            }
+        }
+
     }
     
 
@@ -166,11 +186,11 @@ export default function Gameboard() {
             setSelectedDicePoints(new Array(6).fill(false));
             setSelectedDices(new Array(NBR_OF_DICES).fill(false));
         }
-        if (nbrOfThrowsLeft > 0) {
+        /* if (nbrOfThrowsLeft > 0) {
             !setSelectedDicePoints(false)
             setStatus('Throw 3 times before setting points.');
             
-        }
+        } */
         /* else if (nbrOfThrowsLeft === 0 && selectedDicePoints(false)) {
             !throwDices
             setStatus('Select your points before next throw.')
@@ -191,12 +211,12 @@ export default function Gameboard() {
              onPress={() => throwDices()}>
                 <Text style={styles.buttonText}>Throw dices</Text>
             </Pressable>
-            <Text style={styles.gameinfo}>TOTAL: {}</Text>
+            <Text style={styles.gameinfo}>TOTAL: {0}</Text>
             <Text style={styles.text}>You are {BONUS_POINTS_LIMIT} points away from bonus. </Text>
         <Grid>    
-            <Row><Text style={styles.numbers}>{dicePointsTotal}</Text></Row>
+            <Row><View style={styles.flex}>{row2}</View></Row>
         </Grid>
-            <View style={styles.flex}>{row2}</View>
+            
         </View>
 
     )
