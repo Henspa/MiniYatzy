@@ -49,12 +49,16 @@ export default StyleSheet.create({
     marginBottom: 5,
   },
   row: {
-    marginLeft: 6,
+    marginLeft: 12,
+    width: 300,
+    alignContent:'center',
   },
   flex: {
     flexDirection: "row",
+    alignContent:'center',
     marginTop: 10,
     marginBottom: 10,
+    
   },
   button: {
     margin: 30,

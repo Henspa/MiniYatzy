@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, Pressable } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { Grid, Row } from "react-native-easy-grid";
+import { Col, Grid, Row } from "react-native-easy-grid";
 import styles from '../style/style';
 //import { useFonts } from 'expo-font';
 
@@ -48,12 +48,11 @@ export default function Gameboard() {
 
     const row2 = [];
     for (let s = 1; s <= MAX_SPOT; s++) {
-        row2.push(
-            <View>
-                <Text style={[styles.row]}>{dicePointsTotal[s]}</Text>
-            <Pressable                    
+        row2.push( 
+            <Pressable               
               key={"row2" + s}                   
               onPress={() => selectDicePoint(s)}> 
+              
             <MaterialCommunityIcons
                 name={'numeric-' + s + '-circle'}
                 key={"row2" + s}
@@ -61,15 +60,19 @@ export default function Gameboard() {
                 color={getDicePointColor(s)} > 
             </MaterialCommunityIcons>
             </Pressable> 
-            </View>
         );         
     }  
     
-    /* const row3 = [];
-    for (let s = 1; s <= MAX_SPOT; s++)
+    const row3 = [];
+    for (let spot = 0; spot < MAX_SPOT; spot++)
         row3.push(
-            setDicePointsTotal(dicePointsTotal)
-        ); */ 
+            <Col key={"row3" + spot} >
+                <Text
+                style={styles.row}
+                key={"row3" + spot} >{getDP(spot)}
+                </Text>
+            </Col>    
+        ); 
     
 
     useEffect(() => {
@@ -82,28 +85,6 @@ export default function Gameboard() {
         }
     }, [nbrOfThrowsLeft])
 
-    function throwDices() {
-        for (let i = 0; i < NBR_OF_DICES; i++) {
-            if (!selectedDices[i]) {
-                let randomNumber = Math.floor(Math.random() * 6 + 1);
-                board[i] = 'dice-' + randomNumber;
-            }
-            
-        }
-        setNbrOfThrowsLeft(nbrOfThrowsLeft-1); 
-        
-        /* if (nbrOfThrowsLeft > 0) {
-            !setSelectedDicePoints(false)
-            setStatus('Throw 3 times before setting points.');
-        }
-        else if (nbrOfThrowsLeft === 0 && selectedDicePoints(false)) {
-            !throwDices
-            setStatus('Select your points before next throw.')
-        }
-        else if (nbrOfThrowsLeft === 0 && selectedDicePoints(true)) {
-            setSelectedDices(new Array(NBR_OF_DICES).fill(false));
-        } */
-    }
 
     function getDiceColor(i) {
         if (board.every((val, i, arr) => val === arr[0])) {
@@ -122,6 +103,18 @@ export default function Gameboard() {
             return selectedDicePoints[s] ? "black" : "#ba89eb";
         }    
     } 
+
+    function calculatePointsTotal() {
+        let totalSum = 0;
+        for (let s = 0; s < dicePointsTotal.length; s++) {
+            totalSum += dicePointsTotal[s];
+        }
+        return totalSum;
+    }
+
+    function getDP(s) {
+        return dicePointsTotal[s]
+    }
 
     function selectDice(i) {
         let dices = [...selectedDices];
@@ -145,10 +138,10 @@ export default function Gameboard() {
             setSelectedDicePoints(points);
             setSelectedDices(new Array(NBR_OF_DICES).fill(false));
             setStatus('Throw dices');
-            throwDices();
+            
             if (!points[s]) {
                 points[s] = true;
-                let pointsTotal = [...dicePointsTotal]; 
+                //let pointsTotal = [...dicePointsTotal]; 
             
                 let nbrOfDices = 0;
                 //let nbrOfDices = diceSpots.reduce((total, x) => (x === (s + 1) ? total + 1 : total), 0);
@@ -159,47 +152,47 @@ export default function Gameboard() {
                 }
                 pointsTotal[s] = nbrOfDices * (s + 1) ;
                 setDicePointsTotal(pointsTotal);
-
-                return pointsTotal[s];
             }
+            /* else {
+                setStatus('You already selected points for' + (s +1)); 
+                return pointsTotal[s]; 
+                
+            }
+            //pt.fill(false);
+            setSelectedDices(s);
+            setSelectedDicePoints(points);  */
         }
-
+        
     }
-    
-
-    /* function calculate() {
-        //dicePointsTotal.push(dicesSum * pointsSum);
-        let sum = points * dices;
-        diceSpots += sum; 
-        setDiceSpots(diceSpots); 
-        setDicePointsTotal(dicePointsTotal);
-    }  */
-    
 
     function checkWinner() {
         if (board.every((val, i, arr) => val === arr[0]) && nbrOfThrowsLeft >= 0) {
             setStatus('All same dices, select your points.');
-            setSelectedDices(new Array(NBR_OF_DICES).fill(false));
+            //setSelectedDices(new Array(NBR_OF_DICES).fill(false));
         }
-        else if (board.every((val, s, arr) => val > arr[0]) && nbrOfThrowsLeft === 0) {
+        else if (board.every((val, s, arr) => val > arr[true]) && nbrOfThrowsLeft === 0) {
             setStatus('Game over.');
             setSelectedDicePoints(new Array(6).fill(false));
             setSelectedDices(new Array(NBR_OF_DICES).fill(false));
         }
-        /* if (nbrOfThrowsLeft > 0) {
-            !setSelectedDicePoints(false)
-            setStatus('Throw 3 times before setting points.');
+        
+    }
+
+    function throwDices() {
+        let ds = [...diceSpots];
+        for (let i = 0; i < NBR_OF_DICES; i++) {
+            if (!selectedDices[i]) {
+                let randomNumber = Math.floor(Math.random() * 6 + 1);
+                board[i] = 'dice-' + randomNumber;
+                ds[i] = randomNumber;
+            }
             
-        } */
-        /* else if (nbrOfThrowsLeft === 0 && selectedDicePoints(false)) {
-            !throwDices
-            setStatus('Select your points before next throw.')
         }
-        else if (nbrOfThrowsLeft === 0 && selectedDicePoints(true)) {
-            setSelectedDices(new Array(NBR_OF_DICES).fill(false));
-        } */
-        else 
-            setStatus('Select and throw dices again');
+        setNbrOfThrowsLeft(nbrOfThrowsLeft-1); 
+        setDiceSpots(ds);
+        setStatus('Select and throw dices again');
+        
+    
     }
 
     return(
@@ -211,12 +204,10 @@ export default function Gameboard() {
              onPress={() => throwDices()}>
                 <Text style={styles.buttonText}>Throw dices</Text>
             </Pressable>
-            <Text style={styles.gameinfo}>TOTAL: {0}</Text>
-            <Text style={styles.text}>You are {BONUS_POINTS_LIMIT} points away from bonus. </Text>
-        <Grid>    
-            <Row><View style={styles.flex}>{row2}</View></Row>
-        </Grid>
-            
+            <Text style={styles.gameinfo}>TOTAL: {calculatePointsTotal()}</Text>
+            <Text style={styles.text}>You are {(BONUS_POINTS_LIMIT - calculatePointsTotal())} points away from bonus. </Text>
+            <View style={styles.row}><Grid>{row3}</Grid></View>
+            <View style={styles.flex}><Grid>{row2}</Grid></View>
         </View>
 
     )
